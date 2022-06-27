@@ -1,0 +1,71 @@
+#!/bin/bash
+
+MYSQLDUMP_BIN="$(which mysqldump)"
+
+THE_PATH="/DB_backup"
+
+TODAY=$(date +"%Y-%m-%d")
+DAILY_DELETE_NAME=`date +"%Y-%m-%d" --date '3 days ago'`
+WEEKLY_DELETE_NAME=`date +"%Y-%m-%d" --date '1 weeks ago'`
+MONTHLY_DELETE_NAME=`date +"%Y-%m-%d" --date '1 months ago'`
+
+db="db_name"
+  if [ ! -d "$THE_PATH" ]
+  then
+    mkdir -p "$THE_PATH"
+    mkdir -p "$THE_PATH/DAILY_DB_backup"
+    mkdir -p "$THE_PATH/WEEKLY_DB_backup"
+    mkdir -p "$THE_PATH/MONTHLY_DB_backup"
+  fi
+
+  #Backup generating ##########################
+  $MYSQLDUMP_BIN  $db > $THE_PATH/DAILY_DB_backup/$TODAY.temp.$db.sql
+  mysqlstatus=$?
+  
+  if [ $mysqlstatus -eq 0 ]
+  then
+    
+    echo "Backup generated successfully"
+    
+    cd $THE_PATH/DAILY_DB_backup/
+    tar cvzf $TODAY.temp.$db.tar.gz $TODAY.temp.$db.sql 
+    mysqlstatus=$?
+    if [ $mysqlstatus -eq 0 ]
+    then
+        rm -rf $TODAY.temp.$db.sql
+        
+        #daily ##########################
+        mv $THE_PATH/DAILY_DB_backup/$TODAY.temp.$db.tar.gz $THE_PATH/DAILY_DB_backup/$TODAY.$db.tar.gz
+        mysqlstatus=$?
+        if [ $mysqlstatus -eq 0 ]
+        then
+            rm -rf $THE_PATH/DAILY_DB_backup/$DAILY_DELETE_NAME.$db.tar.gz
+        fi
+        
+        #weekly ##########################
+        if [ `date +%u` -eq 6 ]
+        then
+            cp $THE_PATH/DAILY_DB_backup/$TODAY.$db.tar.gz $THE_PATH/WEEKLY_DB_backup/$TODAY.$db.tar.gz
+            mysqlstatus=$?
+            if [ $mysqlstatus -eq 0 ]
+            then  
+                rm -rf $THE_PATH/WEEKLY_DB_backup/$WEEKLY_DELETE_NAME.$db.tar.gz
+            fi
+        fi
+
+        #monthly ##########################
+        if [ `date +%d` -eq 1 ]
+        then
+            cp $THE_PATH/DAILY_DB_backup/$TODAY.$db.tar.gz $THE_PATH/MONTHLY_DB_backup/$TODAY.$db.tar.gz
+            mysqlstatus=$?
+            if [ $mysqlstatus -eq 0 ]
+            then 
+                rm -rf $THE_PATH/MONTHLY_DB_backup/$MONTHLY_DELETE_NAME.$db.tar.gz
+            fi
+        fi
+    else
+        echo "Facing issue when compressing db"
+    fi
+  else   
+    echo "Facing issue when generating DB backup"
+  fi 
