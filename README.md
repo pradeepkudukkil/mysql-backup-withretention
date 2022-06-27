@@ -12,7 +12,7 @@ Script configuration
   db (line 12), Here you need to mention the DB name that you want to take backup
   
 2. Add the cron job and select the time when you want the script to run, here i am run the script at neight 1 o'clock.
-   0 1 * * * /bin/bash /usr/local/scripts/script_name.sh
+   0 1 * * * /bin/bash /usr/local/scripts/script.sh
    
    
 You can change the monthly and weekly backup days by editing lines 9 and 10.
