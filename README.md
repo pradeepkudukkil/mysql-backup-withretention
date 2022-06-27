@@ -1,7 +1,7 @@
 # Mysql Backup With Retention
 
 
-This is a simple Bash script to take desired MySQL backup with a retention policy(daily, monthly, and weekly). 
+This is a simple Bash script to take desired MySQL DB backup with a retention policy(daily, monthly, and weekly). 
 
 Script configuration
 ============================
