@@ -13,4 +13,8 @@ Script configuration
   
 2. Add the cron job and select the time when you want the script to run, here i am run the script at neight 1 o'clock.
    0 1 * * * /bin/bash /usr/local/scripts/script_name.sh
+   
+   
+You can change the monthly and weekly backup days by editing lines 9 and 10.
+
 
